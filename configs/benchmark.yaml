@@ -1,0 +1,12 @@
+benchmark_subset_fraction: 0.1
+
+models:
+  - unet
+  - deeplabv3
+  - segformer
+
+metrics:
+  - miou
+  - dice
+
+measure_latency: true
