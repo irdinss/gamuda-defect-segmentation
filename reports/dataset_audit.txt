@@ -1,0 +1,7 @@
+DATASET AUDIT
+==================================================
+
+Crack                    19472
+Efflorescence             1233
+Exposed Rebar             4252
+Spalling                  2138
