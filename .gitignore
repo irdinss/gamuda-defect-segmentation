@@ -3,8 +3,13 @@ __pycache__/
 
 .venv/
 venv/
+.venv-1/
+.vscode/
 
 .env
+*.pth
+*.pt
+*.onnx
 
 .ipynb_checkpoints/
 
@@ -14,3 +19,6 @@ models/onnx/
 node_modules/
 
 .DS_Store
+
+reports/experiments/*
+!reports/experiments/.gitkeep
