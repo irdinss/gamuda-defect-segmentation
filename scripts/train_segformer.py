@@ -119,7 +119,7 @@ def main():
 
     model = build_segformer(
         num_classes=config["model"]["num_classes"]
-    )
+    ).to(device)
 
     model = model.to(device)
 
@@ -127,7 +127,7 @@ def main():
         CombinedSegmentationLoss(
             class_weights=CLASS_WEIGHTS
         )
-    )
+    ).to(device)
 
     optimizer = torch.optim.AdamW(
         model.parameters(),
