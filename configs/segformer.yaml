@@ -1,6 +1,20 @@
-model_name: segformer
-encoder: mit_b0
-image_size: 512
-batch_size: 8
-epochs: 10
-learning_rate: 0.0001
+model:
+  name: segformer-b0
+  num_classes: 5
+
+training:
+  epochs: 10
+  batch_size: 8
+  learning_rate: 0.0001
+  weight_decay: 0.00001
+  seed: 42
+
+data:
+  image_size: 512
+
+loss:
+  dice_weight: 0.5
+  ce_weight: 0.5
+
+inference:
+  confidence_threshold: 0.5
