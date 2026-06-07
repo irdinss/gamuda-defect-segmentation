@@ -35,7 +35,7 @@ def create_benchmark_loader(
         subset,
         batch_size=8,
         shuffle=True,
-        num_workers=2
+        num_workers=
     )
 
 

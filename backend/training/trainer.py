@@ -37,11 +37,13 @@ class Trainer:
         for images, masks in tqdm(self.train_loader):
 
             images = images.to(
-                self.device
+                self.device,
+                non_blocking=True,
             )
 
             masks = masks.to(
-                self.device
+                self.device,
+                non_blocking=True,
             )
 
             outputs = self.model(

@@ -113,7 +113,8 @@ def main():
         create_dataloaders(
             dataset_root=DATASET_ROOT,
             batch_size=config["training"]["batch_size"],
-            num_workers=2,
+            num_workers=config["training"]["num_workers"],
+            train_subset_size=config["dataset"]["train_subset_size"],
         )
     )
 
