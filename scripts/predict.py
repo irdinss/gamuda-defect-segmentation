@@ -131,7 +131,7 @@ def main():
 
     checkpoint = torch.load(
         CHECKPOINT_DIR
-        / f"best_segformer.pth",
+        / f"{experiment_name}_best.pth",
         map_location=device,
         weights_only=False,
     )
