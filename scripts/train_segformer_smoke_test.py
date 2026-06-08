@@ -1,5 +1,3 @@
-from pathlib import Path
-import yaml
 import torch
 import torch.nn.functional as F
 
@@ -14,11 +12,8 @@ from backend.models.segformer_model import (
 from backend.training.losses import (
     CombinedSegmentationLoss,
 )
+from backend.config import DATASET_ROOT
 
-with open("configs/dataset.yaml") as f:
-    dataset_cfg = yaml.safe_load(f)
-
-DATASET_ROOT = Path(dataset_cfg["dataset"]["root"])
 
 CLASS_WEIGHTS = [
     1.07,

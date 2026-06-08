@@ -1,17 +1,12 @@
 from collections import Counter
 
 import numpy as np
-import yaml
-from pathlib import Path
 
 from backend.datasets.coco_dataset import (
     CocoSegmentationDataset
 )
+from backend.config import DATASET_ROOT
 
-with open("configs/dataset.yaml") as f:
-    dataset_cfg = yaml.safe_load(f)
-
-DATASET_ROOT = Path(dataset_cfg["dataset"]["root"])
 
 CLASS_NAMES = {
     0: "Background",

@@ -1,14 +1,9 @@
 import json
 from pathlib import Path
-import yaml
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-
-with open("configs/dataset.yaml") as f:
-    dataset_cfg = yaml.safe_load(f)
-
-DATASET_ROOT = Path(dataset_cfg["dataset"]["root"])
+from backend.config import DATASET_ROOT
 
 SPLIT = "train"
 

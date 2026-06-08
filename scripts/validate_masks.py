@@ -1,16 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import yaml
 from pathlib import Path
 
 from backend.datasets.coco_dataset import (
     CocoSegmentationDataset
 )
-
-with open("configs/dataset.yaml") as f:
-    dataset_cfg = yaml.safe_load(f)
-
-DATASET_ROOT = Path(dataset_cfg["dataset"]["root"])
+from backend.config import DATASET_ROOT
 
 
 def main():
