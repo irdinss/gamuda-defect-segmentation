@@ -18,6 +18,8 @@ models/onnx/
 
 node_modules/
 
+artifacts
+
 .DS_Store
 
 reports/experiments/*

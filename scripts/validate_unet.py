@@ -12,8 +12,8 @@ def main():
     x = torch.randn(
         2,
         3,
-        512,
-        512
+        1024,
+        1024
     )
 
     y = model(x)

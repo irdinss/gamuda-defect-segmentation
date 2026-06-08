@@ -8,13 +8,13 @@ from backend.training.metrics import (
 preds = torch.randint(
     0,
     5,
-    (2, 512, 512)
+    (2, 1024, 1024)
 )
 
 targets = torch.randint(
     0,
     5,
-    (2, 512, 512)
+    (2, 1024, 1024)
 )
 
 per_class = compute_per_class_iou(
