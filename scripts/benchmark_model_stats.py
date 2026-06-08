@@ -29,8 +29,8 @@ def main():
     x = torch.randn(
         1,
         3,
-        512,
-        512
+        1024,
+        1024
     )
 
     for _ in range(5):
