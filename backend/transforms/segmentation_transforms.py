@@ -5,8 +5,8 @@ def get_train_transforms():
 
     return A.Compose([
         A.Resize(
-            1024,
-            1024,
+            512,
+            512,
         ),
 
         A.HorizontalFlip(
@@ -28,8 +28,8 @@ def get_valid_transforms():
 
     return A.Compose([
         A.Resize(
-            1024,
-            1024,
+            512,
+            512,
         ),
 
         A.Normalize(

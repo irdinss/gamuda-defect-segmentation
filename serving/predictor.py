@@ -20,7 +20,7 @@ config = load_yaml(
     SEGFORMER_CONFIG_PATH
 )
 
-IMAGE_SIZE = 1024
+IMAGE_SIZE = 512
 
 CLASS_COLORS = {
     0: [0, 0, 0],          # Background
@@ -151,12 +151,10 @@ def run_prediction(
             pixel_values=image_tensor
         )
 
+        original_h, original_w = original_image.shape[:2]
         logits = F.interpolate(
             outputs.logits,
-            size=(
-                IMAGE_SIZE,
-                IMAGE_SIZE,
-            ),
+            size=(original_h, original_w),
             mode="bilinear",
             align_corners=False,
         )
