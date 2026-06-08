@@ -31,6 +31,11 @@ class CocoSegmentationDataset:
 
         self.images = self.coco["images"]
 
+        self.images_by_id = {
+            image["id"]: image
+            for image in self.images
+        }
+
         self.annotations = self.coco["annotations"]
         self.annotations_by_image_id = {}
         for annotation in self.annotations:
@@ -48,10 +53,10 @@ class CocoSegmentationDataset:
 
     def create_mask(self, image_id):
 
-        image_info = next(
-            img
-            for img in self.images
-            if img["id"] == image_id
+        image_info = (
+            self.images_by_id[
+                image_id
+            ]
         )
 
         height = image_info["height"]

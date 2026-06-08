@@ -1,12 +1,12 @@
 import json
+import yaml
 from collections import Counter
 from pathlib import Path
 
+with open("configs/dataset.yaml") as f:
+    dataset_cfg = yaml.safe_load(f)
 
-DATASET_ROOT = Path(
-    r"C:\GAMUDA\Dataset\CONCRETE-25FEB.v3i.coco-segmentation"
-)
-
+DATASET_ROOT = Path(dataset_cfg["dataset"]["root"])
 
 def load_split(split_name):
     annotation_file = (

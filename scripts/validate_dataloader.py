@@ -1,13 +1,13 @@
+import yaml
+from pathlib import Path
 from backend.dataloaders.segmentation_dataloader import (
     create_dataloaders
 )
 
+with open("configs/dataset.yaml") as f:
+    dataset_cfg = yaml.safe_load(f)
 
-DATASET_ROOT = (
-    r"C:\GAMUDA\Dataset"
-    r"\CONCRETE-25FEB.v3i.coco-segmentation"
-)
-
+DATASET_ROOT = Path(dataset_cfg["dataset"]["root"])
 
 def main():
 
