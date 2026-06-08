@@ -40,19 +40,14 @@ from backend.training.experiment import (
     create_experiment_folder,
 )
 
+from backend.config import (
+    DATASET_ROOT,
+    CHECKPOINT_DIR,
+    EXPERIMENTS_DIR,
+    SEGFORMER_CONFIG_PATH,
+    load_yaml,
+)
 CONFIG_PATH = "configs/segformer.yaml"
-
-DATASET_ROOT = (
-    "/content/drive/MyDrive/"
-    "gamuda-segmentation/dataset/"
-    "CONCRETE-25FEB.v3i.coco-segmentation"
-)
-
-CHECKPOINT_DIR = (
-    "/content/drive/MyDrive/"
-    "gamuda-segmentation/checkpoints"
-)
-
 
 CLASS_WEIGHTS = [
     1.07,
@@ -63,24 +58,12 @@ CLASS_WEIGHTS = [
 ]
 
 
-def load_config():
-
-    with open(CONFIG_PATH, "r") as f:
-        return yaml.safe_load(f)
-
-
 def main():
-
-    config = load_config()
-
-    experiment_name = "exp001_baseline"
-
+    config = load_yaml(SEGFORMER_CONFIG_PATH)
+    experiment_name = config["experiment"]["name"]
     experiment_dir = (
-        Path(
-            "/content/drive/MyDrive/"
-            "gamuda-segmentation/experiments"
-        )
-        / experiment_name
+        EXPERIMENTS_DIR /
+        experiment_name
     )
 
     experiment_dir.mkdir(

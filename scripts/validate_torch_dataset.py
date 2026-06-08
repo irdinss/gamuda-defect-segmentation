@@ -1,5 +1,3 @@
-import yaml
-from pathlib import Path
 from backend.datasets.torch_dataset import (
     TorchSegmentationDataset
 )
@@ -8,10 +6,8 @@ from backend.transforms.segmentation_transforms import (
     get_train_transforms
 )
 
-with open("configs/dataset.yaml") as f:
-    dataset_cfg = yaml.safe_load(f)
+from backend.config import DATASET_ROOT
 
-DATASET_ROOT = Path(dataset_cfg["dataset"]["root"])
 
 def main():
 

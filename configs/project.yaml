@@ -2,6 +2,10 @@ dataset:
   root: data/CONCRETE-25FEB.v3i.coco-segmentation
   num_classes: 5
 
+artifacts:
+  checkpoints: artifacts/checkpoints
+  experiments: artifacts/experiments
+
 classes:
   - background
   - crack

@@ -1,3 +1,6 @@
+experiment:
+  name: exp001_baseline
+
 model:
   name: segformer-b0
   num_classes: 5
