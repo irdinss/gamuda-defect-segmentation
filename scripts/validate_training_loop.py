@@ -1,5 +1,6 @@
 import torch
-
+import yaml
+from pathlib import Path
 from backend.models.unet_model import (
     create_unet
 )
@@ -13,10 +14,10 @@ from backend.training.train_one_epoch import (
 )
 
 
-DATASET_ROOT = (
-    r"C:\GAMUDA\Dataset"
-    r"\CONCRETE-25FEB.v3i.coco-segmentation"
-)
+with open("configs/dataset.yaml") as f:
+    dataset_cfg = yaml.safe_load(f)
+
+DATASET_ROOT = Path(dataset_cfg["dataset"]["root"])
 
 
 def main():

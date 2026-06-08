@@ -42,6 +42,16 @@ class TorchSegmentationDataset(
             self.dataset.images[idx]
         )
 
+        image_stem = Path(
+            image_info["file_name"]
+        ).stem
+
+        mask_path = (
+            self.dataset_root
+            / f"{self.split}_masks"
+            / f"{image_stem}.png"
+        )
+
         image_path = (
             self.dataset_root
             / self.split
@@ -57,11 +67,15 @@ class TorchSegmentationDataset(
             cv2.COLOR_BGR2RGB
         )
 
-        mask = (
-            self.dataset.create_mask(
-                image_info["id"]
-            )
+        mask = cv2.imread(
+            str(mask_path),
+            cv2.IMREAD_GRAYSCALE,
         )
+
+        if mask is None:
+            raise FileNotFoundError(
+                f"Mask not found: {mask_path}"
+            )
 
         if self.transform:
 
