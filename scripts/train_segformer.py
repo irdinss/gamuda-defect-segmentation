@@ -190,8 +190,8 @@ def main():
             epoch=epoch + 1,
             miou=val_miou,
             path=(
-                f"{CHECKPOINT_DIR}/"
-                "last_segformer.pth"
+                 CHECKPOINT_DIR
+                / f"{experiment_name}_best.pth"
             ),
         )
 
@@ -205,8 +205,8 @@ def main():
                 epoch=epoch + 1,
                 miou=val_miou,
                 path=(
-                    f"{CHECKPOINT_DIR}/"
-                    "best_segformer.pth"
+                    CHECKPOINT_DIR 
+                    / f"{experiment_name}_best.pth"
                 ),
             )
 

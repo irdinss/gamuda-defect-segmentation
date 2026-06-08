@@ -1,12 +1,12 @@
 experiment:
-  name: exp001_baseline
+  name: exp002_30epochs_alldataset
 
 model:
   name: segformer-b0
   num_classes: 5
 
 training:
-  epochs: 5
+  epochs: 15
   batch_size: 16
   learning_rate: 0.0001
   weight_decay: 0.00001
@@ -17,7 +17,7 @@ data:
   image_size: 512
 
 dataset:
-  train_subset_size: 3000
+  train_subset_size: null
 
 loss:
   dice_weight: 0.5
