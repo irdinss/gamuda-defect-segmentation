@@ -20,7 +20,7 @@ def main():
     subset = (
         create_benchmark_subset(
             dataset,
-            subset_size=1024
+            subset_size=512
         )
     )
 

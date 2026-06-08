@@ -4,8 +4,6 @@ from pathlib import Path
 import cv2
 import numpy as np
 import torch
-import torch.nn.functional as F
-import albumentations as A
 
 from backend.config import (
     CHECKPOINT_DIR,
@@ -22,16 +20,13 @@ config = load_yaml(
     SEGFORMER_CONFIG_PATH
 )
 
-IMAGE_SIZE = 512
-
 CLASS_COLORS = {
     0: [0, 0, 0],
-    1: [255, 0, 0],      # Crack
-    2: [0, 255, 0],      # Efflorescence
-    3: [0, 0, 255],      # Exposed Rebar
-    4: [255, 255, 0],    # Spalling
+    1: [255, 0, 0],
+    2: [0, 255, 0],
+    3: [0, 0, 255],
+    4: [255, 255, 0],
 }
-
 
 def create_color_mask(mask):
 
@@ -49,39 +44,6 @@ def create_color_mask(mask):
         ] = color
 
     return output
-
-
-def create_presentation_overlay(
-    image,
-    prediction,
-):
-
-    display_mask = prediction.copy()
-
-    kernel = np.ones(
-        (5, 5),
-        np.uint8,
-    )
-
-    display_mask = cv2.dilate(
-        display_mask.astype(np.uint8),
-        kernel,
-        iterations=2,
-    )
-
-    colored_mask = create_color_mask(
-        display_mask
-    )
-
-    overlay = cv2.addWeighted(
-        image,
-        0.6,
-        colored_mask,
-        0.4,
-        0,
-    )
-
-    return colored_mask, overlay
 
 
 def main():
@@ -133,7 +95,6 @@ def main():
         CHECKPOINT_DIR
         / f"{experiment_name}_best.pth",
         map_location=device,
-        weights_only=False,
     )
 
     model.load_state_dict(
@@ -147,34 +108,22 @@ def main():
         str(image_path)
     )
 
-    original_image = image.copy()
-
     image_rgb = cv2.cvtColor(
         image,
         cv2.COLOR_BGR2RGB,
     )
 
-    transform = A.Compose([
-        A.Resize(
-            IMAGE_SIZE,
-            IMAGE_SIZE,
-        ),
-        A.Normalize(
-            mean=(0.485, 0.456, 0.406),
-            std=(0.229, 0.224, 0.225),
-        ),
-    ])
-
-    transformed = transform(
-        image=image_rgb
-    )
-
     image_tensor = (
         torch.tensor(
-            transformed["image"]
+            image_rgb
         )
         .permute(2, 0, 1)
         .float()
+        / 255.0
+    )
+
+    image_tensor = (
+        image_tensor
         .unsqueeze(0)
         .to(device)
     )
@@ -184,16 +133,9 @@ def main():
         outputs = model(
             pixel_values=image_tensor
         )
-        original_h, original_w = original_image.shape[:2]
-        logits = F.interpolate(
-            outputs.logits,
-            size=(original_h, original_w),
-            mode="bilinear",
-            align_corners=False,
-        )
 
         prediction = (
-            logits
+            outputs.logits
             .argmax(dim=1)
             .squeeze()
             .cpu()
@@ -206,11 +148,12 @@ def main():
         )
     )
 
-    presentation_mask, overlay = (
-        create_presentation_overlay(
-            original_image,
-            prediction,
-        )
+    overlay = cv2.addWeighted(
+        image,
+        0.7,
+        prediction_mask,
+        0.3,
+        0,
     )
 
     cv2.imwrite(
@@ -218,23 +161,15 @@ def main():
             prediction_dir
             / "image.png"
         ),
-        original_image,
+        image,
     )
 
     cv2.imwrite(
         str(
             prediction_dir
-            / "prediction_mask.png"
+            / "prediction.png"
         ),
         prediction_mask,
-    )
-
-    cv2.imwrite(
-        str(
-            prediction_dir
-            / "presentation_mask.png"
-        ),
-        presentation_mask,
     )
 
     cv2.imwrite(
@@ -249,24 +184,6 @@ def main():
         f"Saved results to "
         f"{prediction_dir}"
     )
-
-    
-    with torch.no_grad():
-
-        outputs = model(
-            pixel_values=image_tensor
-        )
-
-        print(
-            "Input shape:",
-            image_tensor.shape
-        )
-
-        print(
-            "Raw logits shape:",
-            outputs.logits.shape
-        )
-
 
 if __name__ == "__main__":
     main()
