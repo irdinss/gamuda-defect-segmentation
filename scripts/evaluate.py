@@ -2,6 +2,7 @@ from pathlib import Path
 import json
 
 import torch
+import torch.nn.functional as F
 
 from backend.config import (
     DATASET_ROOT,
@@ -69,6 +70,7 @@ def main():
     checkpoint = torch.load(
         checkpoint_path,
         map_location=device,
+        weights_only=False,
     )
 
     model.load_state_dict(
@@ -92,7 +94,12 @@ def main():
                 pixel_values=images
             )
 
-            logits = outputs.logits
+            logits = F.interpolate(
+                outputs.logits,
+                size=masks.shape[-2:],
+                mode="bilinear",
+                align_corners=False,
+            )
 
             predictions = torch.argmax(
                 logits,

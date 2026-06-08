@@ -1,4 +1,3 @@
-import argparse
 from pathlib import Path
 
 import cv2
@@ -9,7 +8,6 @@ import albumentations as A
 
 from backend.config import (
     CHECKPOINT_DIR,
-    EXPERIMENTS_DIR,
     SEGFORMER_CONFIG_PATH,
     load_yaml,
 )
@@ -25,12 +23,35 @@ config = load_yaml(
 IMAGE_SIZE = 1024
 
 CLASS_COLORS = {
-    0: [0, 0, 0],
-    1: [255, 0, 0],      # Crack
-    2: [0, 255, 0],      # Efflorescence
-    3: [0, 0, 255],      # Exposed Rebar
-    4: [255, 255, 0],    # Spalling
+    0: [0, 0, 0],          # Background
+    1: [255, 0, 0],        # Crack
+    2: [0, 255, 0],        # Efflorescence
+    3: [0, 0, 255],        # Exposed Rebar
+    4: [255, 255, 0],      # Spalling
 }
+
+device = torch.device(
+    "cuda"
+    if torch.cuda.is_available()
+    else "cpu"
+)
+
+model = build_segformer(
+    num_classes=config["model"]["num_classes"]
+)
+
+checkpoint = torch.load(
+    CHECKPOINT_DIR / "best_segformer.pth",
+    map_location=device,
+    weights_only=False,
+)
+
+model.load_state_dict(
+    checkpoint["model_state_dict"]
+)
+
+model.to(device)
+model.eval()
 
 
 def create_color_mask(mask):
@@ -84,64 +105,9 @@ def create_presentation_overlay(
     return colored_mask, overlay
 
 
-def main():
-
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument(
-        "--image",
-        required=True,
-    )
-
-    args = parser.parse_args()
-
-    experiment_name = (
-        config["experiment"]["name"]
-    )
-
-    image_path = Path(
-        args.image
-    )
-
-    image_stem = (
-        image_path.stem
-    )
-
-    prediction_dir = (
-        EXPERIMENTS_DIR
-        / experiment_name
-        / "predictions"
-        / image_stem
-    )
-
-    prediction_dir.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
-
-    device = torch.device(
-        "cuda"
-        if torch.cuda.is_available()
-        else "cpu"
-    )
-
-    model = build_segformer(
-        num_classes=config["model"]["num_classes"]
-    )
-
-    checkpoint = torch.load(
-        CHECKPOINT_DIR
-        / f"best_segformer.pth",
-        map_location=device,
-        weights_only=False,
-    )
-
-    model.load_state_dict(
-        checkpoint["model_state_dict"]
-    )
-
-    model.to(device)
-    model.eval()
+def run_prediction(
+    image_path: Path
+):
 
     image = cv2.imread(
         str(image_path)
@@ -209,67 +175,44 @@ def main():
         )
     )
 
-    presentation_mask, overlay = (
+    _, overlay = (
         create_presentation_overlay(
             original_image,
             prediction,
         )
     )
 
-    cv2.imwrite(
-        str(
-            prediction_dir
-            / "image.png"
-        ),
-        original_image,
+    total_pixels = prediction.size
+
+    crack = round(
+        100 * np.sum(prediction == 1)
+        / total_pixels,
+        2,
     )
 
-    cv2.imwrite(
-        str(
-            prediction_dir
-            / "prediction_mask.png"
-        ),
-        prediction_mask,
+    efflorescence = round(
+        100 * np.sum(prediction == 2)
+        / total_pixels,
+        2,
     )
 
-    cv2.imwrite(
-        str(
-            prediction_dir
-            / "presentation_mask.png"
-        ),
-        presentation_mask,
+    corrosion = round(
+        100 * np.sum(prediction == 3)
+        / total_pixels,
+        2,
     )
 
-    cv2.imwrite(
-        str(
-            prediction_dir
-            / "overlay.png"
-        ),
-        overlay,
+    spall = round(
+        100 * np.sum(prediction == 4)
+        / total_pixels,
+        2,
     )
 
-    print(
-        f"Saved results to "
-        f"{prediction_dir}"
-    )
-
-    
-    with torch.no_grad():
-
-        outputs = model(
-            pixel_values=image_tensor
-        )
-
-        print(
-            "Input shape:",
-            image_tensor.shape
-        )
-
-        print(
-            "Raw logits shape:",
-            outputs.logits.shape
-        )
-
-
-if __name__ == "__main__":
-    main()
+    return {
+        "overlay": overlay,
+        "prediction_mask": prediction_mask,
+        "crack": crack,
+        "efflorescence": efflorescence,
+        "corrosion": corrosion,
+        "spall": spall,
+    }
