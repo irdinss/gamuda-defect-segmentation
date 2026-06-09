@@ -20,6 +20,10 @@ config = load_yaml(
     SEGFORMER_CONFIG_PATH
 )
 
+experiment_name = (
+    config["experiment"]["name"]
+)
+
 IMAGE_SIZE = 512
 
 CLASS_COLORS = {
@@ -41,7 +45,7 @@ model = build_segformer(
 )
 
 checkpoint = torch.load(
-    CHECKPOINT_DIR / "best_segformer.pth",
+    CHECKPOINT_DIR / f"{experiment_name}_best.pth",
     map_location=device,
     weights_only=False,
 )
