@@ -19,9 +19,17 @@ models/onnx/
 
 node_modules/
 
-artifacts
+artifacts/experiments/
+artifacts/predictions/
+artifacts/uploads/
+
+# Debug outputs
+debug_masks/
+
+# Reports
+reports/
+!reports/.gitkeep
+!reports/experiments/
+!reports/experiments/.gitkeep
 
 .DS_Store
-
-reports/experiments/*
-!reports/experiments/.gitkeep
