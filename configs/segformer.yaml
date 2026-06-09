@@ -1,5 +1,5 @@
 experiment:
-  name: best_segformer
+  name: exp005_e30_b32_lr001_d5_c5
 
 model:
   name: segformer-b0
@@ -7,14 +7,14 @@ model:
 
 training:
   epochs: 30
-  batch_size: 16
-  learning_rate: 0.00005
+  batch_size: 32
+  learning_rate: 0.0001
   weight_decay: 0.00001
   seed: 42
   num_workers: 2
 
 data:
-  image_size: 1024
+  image_size: 512
 
 dataset:
   train_subset_size: null
