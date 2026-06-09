@@ -7,7 +7,7 @@ venv/
 .vscode/
 
 .env
-*.pth
+.pth
 *.pt
 *.onnx
 .vite/
