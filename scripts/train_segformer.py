@@ -1,5 +1,5 @@
 from pathlib import Path
-
+import argparse
 import torch
 import yaml
 import shutil
@@ -41,7 +41,6 @@ from backend.training.experiment import (
 )
 
 from backend.config import (
-    DATASET_ROOT,
     CHECKPOINT_DIR,
     EXPERIMENTS_DIR,
     SEGFORMER_CONFIG_PATH,
@@ -57,8 +56,24 @@ CLASS_WEIGHTS = [
     29.35,
 ]
 
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Train SegFormer defect segmentation model"
+    )
+
+    parser.add_argument(
+        "--data_dir",
+        type=str,
+        required=True,
+        help="Path to dataset root",
+    )
+
+    return parser.parse_args()
 
 def main():
+    args = parse_args()
+    dataset_root = Path(args.data_dir)
+
     config = load_yaml(SEGFORMER_CONFIG_PATH)
     experiment_name = config["experiment"]["name"]
     experiment_dir = (
@@ -94,7 +109,7 @@ def main():
 
     train_loader, valid_loader = (
         create_dataloaders(
-            dataset_root=DATASET_ROOT,
+            dataset_root=dataset_root,
             batch_size=config["training"]["batch_size"],
             num_workers=config["training"]["num_workers"],
             train_subset_size=config["dataset"]["train_subset_size"],
