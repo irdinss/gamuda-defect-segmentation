@@ -262,6 +262,118 @@ export default function App() {
         </Card>
     );
 
+    const SummaryCard = () => {
+
+        const detected = [];
+
+        if (stats.Crack > 0) detected.push("Crack");
+        if (stats.Corrosion > 0) detected.push("Corrosion");
+        if (stats.Spall > 0) detected.push("Spall");
+        if (stats.Efflorescence > 0) detected.push("Efflorescence");
+
+        return (
+            <Card
+                sx={{
+                    p: 3,
+                    background: "#0f172a",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    height: "100%",
+                }}
+            >
+                <Typography variant="h6" mb={2}>
+                    Detected Defects
+                </Typography>
+
+                {detected.length > 0 ? (
+                    <Stack spacing={1}>
+                        {detected.map((item) => (
+                            <Typography
+                                key={item}
+                                sx={{
+                                    fontSize: 18,
+                                    fontWeight: 600,
+                                }}
+                            >
+                                ✓ {item}
+                            </Typography>
+                        ))}
+                    </Stack>
+                ) : (
+                    <Typography color="#94a3b8">
+                        No defects detected
+                    </Typography>
+                )}
+            </Card>
+        );
+    };
+
+    const LegendCard = () => (
+        <Card
+            sx={{
+                p: 3,
+                background: "#0f172a",
+                border: "1px solid rgba(255,255,255,0.08)",
+                height: "100%",
+            }}
+        >
+            <Typography variant="h6" mb={2}>
+                Legend
+            </Typography>
+
+            <Stack spacing={2}>
+
+                <Stack direction="row" spacing={2} alignItems="center">
+                    <Box
+                        sx={{
+                            width: 18,
+                            height: 18,
+                            bgcolor: "#0000ff",
+                            borderRadius: "50%",
+                        }}
+                    />
+                    <Typography>Crack</Typography>
+                </Stack>
+
+                <Stack direction="row" spacing={2} alignItems="center">
+                    <Box
+                        sx={{
+                            width: 18,
+                            height: 18,
+                            bgcolor: "#00ff00",
+                            borderRadius: "50%",
+                        }}
+                    />
+                    <Typography>Efflorescence</Typography>
+                </Stack>
+
+                <Stack direction="row" spacing={2} alignItems="center">
+                    <Box
+                        sx={{
+                            width: 18,
+                            height: 18,
+                            bgcolor: "#ff0000",
+                            borderRadius: "50%",
+                        }}
+                    />
+                    <Typography>Exposed Rebar / Corrosion</Typography>
+                </Stack>
+
+                <Stack direction="row" spacing={2} alignItems="center">
+                    <Box
+                        sx={{
+                            width: 18,
+                            height: 18,
+                            bgcolor: "#00ffff",
+                            borderRadius: "50%",
+                        }}
+                    />
+                    <Typography>Spalling</Typography>
+                </Stack>
+
+            </Stack>
+        </Card>
+    );
+
     return (
 
         <Box
@@ -449,6 +561,35 @@ export default function App() {
                             />
                         </Box>
                         
+                    </Grid>
+
+                </Grid>
+
+                <Grid
+                    container
+                    spacing={3}
+                    sx={{
+                        width: "100%",
+                        mt: 3,
+                    }}
+                >
+                    <Grid
+                        size={{
+                            xs: 12,
+                            md: 6,
+                        }}
+                    >
+                        <SummaryCard />
+                    </Grid>
+
+                    <Grid
+                        size={{
+                            xs: 12,
+                            md: 6,
+                        }}
+                    >
+                        <LegendCard />
+
                     </Grid>
 
                 </Grid>

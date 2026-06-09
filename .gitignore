@@ -10,6 +10,7 @@ venv/
 *.pth
 *.pt
 *.onnx
+.vite/
 
 .ipynb_checkpoints/
 
