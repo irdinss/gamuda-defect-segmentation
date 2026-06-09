@@ -1,8 +1,9 @@
 from pathlib import Path
 import json
-
+import argparse
 import torch
 import torch.nn.functional as F
+from tqdm import tqdm
 
 from backend.config import (
     DATASET_ROOT,
@@ -34,6 +35,17 @@ device = torch.device(
     else "cpu"
 )
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "--data_dir",
+        type=str,
+        required=True,
+        help="Path to dataset root"
+    )
+
+    return parser.parse_args()
 
 def compute_per_class_iou(
     predictions,
@@ -80,6 +92,9 @@ def compute_pixel_accuracy(
 
 def main():
 
+    args = parse_args()
+    dataset_root  = Path(args.data_dir)
+
     evaluation_dir = (
         EXPERIMENTS_DIR
         / experiment_name
@@ -92,7 +107,7 @@ def main():
     )
 
     _, valid_loader = create_dataloaders(
-        dataset_root=DATASET_ROOT,
+        dataset_root=dataset_root,
         batch_size=config["training"]["batch_size"],
         num_workers=config["training"]["num_workers"],
         train_subset_size=None,
@@ -149,7 +164,11 @@ def main():
 
     with torch.no_grad():
 
-        for images, masks in valid_loader:
+        for images, masks in tqdm(
+            valid_loader,
+            desc="Evaluating",
+            unit="batch",
+        ):
 
             images = images.to(device)
 
