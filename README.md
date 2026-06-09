@@ -34,7 +34,27 @@ The solution demonstrates:
 ---
 
 
-## Setup
+# Setup
+
+## Dataset
+
+Dataset Source: https://universe.roboflow.com/concrete-ydnrv/concrete-25feb
+
+####  Download the dataset from: https://drive.google.com/drive/folders/1ChyEiAxrwC5YZ1Sr_j_uB6dkvLjnPEdj?usp=sharing
+
+
+The dataset may be extracted to any location.
+```text
+D:\datasets\CONCRETE-25FEB.v3i.coco-segmentation
+                    or
+~/datasets/CONCRETE-25FEB.v3i.coco-segmentation
+```
+The dataset path will be used at runtime through command-line arguments.
+
+---
+
+
+## Local Setup
 
 ### Clone Repository
 
@@ -66,31 +86,26 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
----
-
-## Dataset
-
-Dataset Source: https://universe.roboflow.com/concrete-ydnrv/concrete-25feb
-
-####  Download the dataset from: https://drive.google.com/drive/folders/1ChyEiAxrwC5YZ1Sr_j_uB6dkvLjnPEdj?usp=sharing
-
-
-The dataset may be extracted to any location.
-```text
-D:\datasets\CONCRETE-25FEB.v3i.coco-segmentation
-                    or
-~/datasets/CONCRETE-25FEB.v3i.coco-segmentation
+## Google Colab Setup
+**Open Google Colab: Setting > Runtime > Change runtime type > Select T4 GPU > Click Save**
+```bash
+from google.colab import drive
+drive.mount("/content/drive")
 ```
-The dataset path will be used at runtime through command-line arguments.
-
----
-
-## Training
-
-Train the segmentation model:
 
 ```bash
-python -m scripts.train_segformer --data_dir "/path/to/CONCRETE-25FEB.v3i.coco-segmentation"
+import torch
+print(torch.cuda.is_available())
+print(torch.cuda.get_device_name(0))
+```
+
+### Put the extracted Dataset in Google Drive > Copy file path
+
+```bash
+! git clone https://github.com/irdinss/gamuda-defect-segmentation.git
+%cd gamuda-defect-segmentation
+!git pull
+!pip install -r requirements.txt
 ```
 
 ---
