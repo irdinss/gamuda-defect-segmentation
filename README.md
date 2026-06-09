@@ -152,24 +152,19 @@ artifacts/checkpoints/exp005_e30_b32_lr001_d5_c5_best.pth
 
 #### Backend: Python + PyTorch
 
-Deployment URL:
-
-```text
+**Deployment URL:**
 https://irdinabisri-gamuda-defect-segmentation.hf.space/
-```
 
-Demo Video:
-
-```text
-[PLACEHOLDER_VIDEO_LINK]
-```
 
 ---
 
 ## Documentation
 
-Additional technical documentation:
-* ARCHITECTURE.md
-* DECISIONS.md
+* **Demo Video:** https://youtu.be/ShNRcE0HOjo
 
+* **ARCHITECTURE.md:** https://github.com/irdinss/gamuda-defect-segmentation/blob/development/ARCHITECTURE.md
+
+* **DECISIONS.md:** https://github.com/irdinss/gamuda-defect-segmentation/blob/development/DECISIONS.md
+
+* **EVALUATIONS.md:** https://github.com/irdinss/gamuda-defect-segmentation/blob/development/EVALUATIONS.md
 
