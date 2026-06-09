@@ -48,7 +48,7 @@ The system targets a practical inspection workflow where engineers upload an ima
 
 # System Architecture
 
-![alt text](system_architecture.png)
+![alt text](docs/images/system_architecture.png)
 The system consists of four main stages:
 
 1. Data preparation

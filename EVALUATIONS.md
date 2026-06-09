@@ -201,8 +201,8 @@ The following examples shows both successful predictions and failure cases obser
 
 ### Example 1: Successful Crack Segmentation
 
-![alt text](image-6.png)
-![alt text](image-7.png)
+![alt text](docs/images/image-6.png)
+![alt text](docs/images/image-7.png)
 
 **Observation**
 
@@ -223,8 +223,8 @@ These results indicate that the model learned meaningful structural representati
 
 ### Example 2: Good Efflorescence Detection
 
-![alt text](image-3.png)
-![alt text](image-8.png)
+![alt text](docs/images/image-3.png)
+![alt text](docs/images/image-8.png)
 
 **Observation**
 
@@ -246,8 +246,8 @@ The model demonstrates strong sensitivity to moisture-related degradation patter
 
 ### Example 3: Good Corrosion/Exposed Rebar & Spalling Detection
 
-![alt text](image.png)
-![alt text](image-2.png)
+![alt text](docs/images/image.png)
+![alt text](docs/images/image-2.png)
 
 **Observation**
 
@@ -269,7 +269,7 @@ The ability to distinguish between spalling and exposed reinforcement is operati
 ---
 
 ### Example 4: Failed Corrosion Detection
-![alt text](image-1.png)
+![alt text](docs/images/image-1.png)
 
 **Observation**
 
@@ -300,7 +300,7 @@ Performance may improve through:
 
 ### Example 5: Failure Case: Detected Corrosion in Efflorescence & Spalling Image
 
-![alt text](image-4.png)
+![alt text](docs/images/image-4.png)
 
 
 **Observation**
@@ -331,7 +331,7 @@ Future work could incorporate:
 
 ### Example 6: Edge Case: Complex Surface Texture
 
-![alt text](image-5.png)
+![alt text](docs/images/image-5.png)
 
 **Observation**
 
@@ -353,7 +353,7 @@ This result provides evidence that the model can operate under practical inspect
 
 ### Example 7: Edge Case: Large-Scale Scene With Small Defects
 
-![alt text](image-9.png)
+![alt text](docs/images/image-9.png)
 
 **Observation**
 
