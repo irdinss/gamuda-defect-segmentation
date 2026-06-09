@@ -1,11 +1,28 @@
 
 # Architecture Document
 
-## Infrastructure Defect Segmentation System
+Infrastructure Defect Segmentation System
+ 
+---
 
-Candidate Name: Nurfarah Irdina Binti Mohamad Bisri
+# Architecture Principles
 
-Role Applied: Senior AI Engineer (Computer Vision)
+The system design follows four architectural principles:
+
+1. Modularity
+   - Data processing, training, inference, and visualization are isolated into independent components.
+   - Components can evolve independently without introducing changes across the entire system.
+
+2. Reproducibility
+   - Experiments are configuration-driven and versioned through structured checkpoint naming.
+   - Training runs can be reproduced from configuration and dataset versions.
+
+3. Deployability
+   - The inference pipeline remains lightweight enough for deployment on free-tier cloud infrastructure.
+   - Training and serving workloads remain decoupled.
+
+4. Extensibility
+   - New defect classes, datasets, or segmentation backbones can be integrated with minimal code changes.
 
 ---
 
@@ -29,25 +46,9 @@ The system targets a practical inspection workflow where engineers upload an ima
 
 # 2. High-Level System Architecture
 
-```text
-Image Upload
-      │
-      ▼
-Preprocessing
-      │
-      ▼
-SegFormer-B0
-      │
-      ▼
-Segmentation Mask
-      │
-      ▼
-Overlay Generation
-      │
-      ▼
-Result Visualization
-```
+# System Architecture
 
+![alt text](system_architecture.png)
 The system consists of four main stages:
 
 1. Data preparation
@@ -123,73 +124,45 @@ Since inspection images are often captured from different angles and distances, 
 
 # 4. Model Selection
 
-## Candidate Models Considered
+## Candidate Model Evaluation
 
-Several segmentation architectures were evaluated before implementation.
+The project evaluated three semantic segmentation architectures:
 
-### U-Net
+- U-Net
+- DeepLabV3+
+- SegFormer-B0
 
-Advantages:
+Each model was trained using the same dataset split, augmentation pipeline, image resolution, and evaluation procedure to ensure a fair comparison.
 
-* Simple architecture
-* Easy to train
-* Low computational requirements
+### Initial Benchmark
 
-Disadvantages:
+![Initial Benchmark](initial_benchmark.png)
 
-* Limited ability to capture broader image context
-* Performance may degrade in complex backgrounds
+The initial benchmark showed that both DeepLabV3+ and SegFormer-B0 significantly outperformed U-Net. U-Net struggled to learn meaningful segmentation boundaries on the dataset and was excluded from subsequent experiments.
 
----
+### Refined Benchmark
 
-### DeepLabV3+
+After refining the training configuration and hyperparameters, DeepLabV3+ and SegFormer-B0 were re-evaluated.
 
-Advantages:
+![Refined Benchmark](refined_benchmark.png)
 
-* Strong segmentation performance
-* Proven track record in production environments
 
-Disadvantages:
+## Selected Model: SegFormer-B0
 
-* Higher computational cost
-* More demanding deployment requirements
+SegFormer-B0 achieved the highest segmentation quality with an mIoU of 0.373, outperforming DeepLabV3+ by approximately 31.8% relative improvement while maintaining comparable inference latency.
 
----
+| Model | Parameters | Latency (ms) | mIoU |
+|---------|------------|-------------|-------------|
+| DeepLabV3+ | 4.38M | 10.25 | 0.283 |
+| SegFormer-B0 | 3.72M | 12.05 | 0.373 |
 
-### SegFormer-B0 (Selected)
+The selection was driven by three observations:
 
-Advantages:
+1. SegFormer-B0 achieved the highest validation mIoU.
+2. SegFormer-B0 required fewer parameters than DeepLabV3+.
+3. The additional inference latency (~1.8 ms) was negligible relative to the improvement in segmentation quality.
 
-* Strong balance between accuracy and efficiency
-* Lightweight architecture suitable for limited GPU resources
-* Effective performance on fine-grained segmentation tasks
-* Ability to capture both local and global image information
-
-Disadvantages:
-
-* Higher computational requirements than U-Net
-* Relies on pretrained weights for best performance
-
----
-
-## Why SegFormer-B0 Was Selected
-
-The assessment environment relied on limited GPU resources, which required a model that balanced performance and practicality.
-
-The selected architecture needed to provide:
-
-* Competitive segmentation quality
-* Reasonable training time
-* Manageable memory usage
-* Straightforward deployment
-
-SegFormer-B0 offered the strongest balance across these requirements.
-
-Compared to larger transformer-based models, SegFormer-B0 trains efficiently on a Tesla T4 GPU while still benefiting from transformer-based feature extraction. Compared to lighter convolutional models, it captures broader image context that can help distinguish defects from surrounding concrete textures.
-
-For the scope of this project, SegFormer-B0 provided the most practical trade-off between accuracy, speed, and deployment complexity.
-
----
+Infrastructure defects such as cracks, corrosion, and spalling often appear as thin structures embedded within complex concrete textures. The transformer-based encoder in SegFormer-B0 captured long-range contextual information more effectively than the convolution-based alternatives evaluated in this project.
 
 # 5. Training Pipeline
 
@@ -217,6 +190,26 @@ Dice Loss focuses on overlap quality between predicted masks and ground-truth ma
 Each loss addresses a different aspect of segmentation performance. Combining both encourages accurate pixel predictions while also improving mask quality, particularly for smaller defect regions.
 
 ---
+
+## Fine-Tuning Strategy
+
+The project uses transfer learning rather than training from scratch.
+
+Training follows three objectives:
+
+1. Preserve general visual features learned during pretraining.
+2. Adapt the decoder to infrastructure defect segmentation.
+3. Improve performance on minority defect classes.
+
+Key training decisions:
+
+- Initialize from pretrained SegFormer-B0 weights.
+- Resize all images to 512×512 for consistent batch processing.
+- Apply geometric augmentation during training only.
+- Use weighted cross-entropy and Dice loss to address class imbalance.
+- Select the final checkpoint based on validation mIoU.
+
+This strategy reduces convergence time while maximizing performance under limited training resources.
 
 ## Training Workflow
 
@@ -254,6 +247,64 @@ The training process follows these steps:
 
 The system tracks validation performance throughout training and stores the best-performing checkpoint based on validation mIoU.
 
+# Final Training Configuration Chosen
+
+| Parameter          | Value                                     |
+| ------------------ | ----------------------------------------- |
+| Backbone           | SegFormer-B0                              |
+| Pretrained Weights | nvidia/segformer-b0-finetuned-ade-512-512 |
+| Epochs             | 30                                        |
+| Batch Size         | 32                                        |
+| Learning Rate      | 0.001                                     |
+| Input Resolution   | 512 × 512                                 |
+| Loss Function      | Weighted Cross Entropy + Dice Loss        |
+
+Best experiment:
+
+```text
+exp005_e30_b32_lr001_d5_c5
+```
+
+Best validation epoch:
+
+```text
+27
+```
+
+Best validation mIoU:
+
+```text
+0.5611
+```
+
+# Production Bottlenecks
+
+The current implementation is optimized for assessment delivery rather than large-scale production workloads.
+
+| Component | Limitation |
+|------------|-------------|
+| Model Inference | Single-model execution limits throughput |
+| Image Upload | Large image sizes increase preprocessing latency |
+| GPU Availability | Shared free-tier resources introduce queueing |
+| Visualization | Overlay generation adds post-processing overhead |
+
+
+# Architectural Rationale
+
+The architecture prioritizes execution reliability, maintainability, and deployment simplicity over maximum model complexity.
+
+The design deliberately separates training, inference, and visualization concerns to reduce coupling between components and simplify future enhancements.
+
+Within the constraints of the assessment, this approach provides:
+
+- Reproducible experimentation
+- Efficient model training
+- Maintainable code structure
+- Straightforward deployment
+- Clear scalability paths
+
+The resulting system delivers an end-to-end infrastructure defect segmentation workflow while remaining adaptable to future datasets, model architectures, and deployment environments.
+
 ---
 
 # 6. Inference Pipeline
@@ -288,7 +339,7 @@ The overlay image provides a direct comparison between the original structure an
 
 ---
 
-# 8. Deployment Architecture
+# 8. Deployment Workflow
 
 The deployment architecture remains intentionally lightweight.
 
@@ -350,21 +401,6 @@ Potential improvements include:
 
 These changes would improve throughput and reduce response times under heavier workloads.
 
----
-
-## Edge Deployment
-
-Deploying the model on mobile devices or embedded hardware would require additional optimization.
-
-Potential approaches include:
-
-* Model quantization
-* ONNX export
-* TensorRT optimization
-
-These techniques reduce memory usage and improve inference speed on resource-constrained devices.
-
----
 
 # 10. Future Improvements
 
@@ -379,106 +415,3 @@ Potential future work includes:
 * Video-based defect segmentation
 * Multi-model ensemble approaches
 
-The current architecture supports these extensions without requiring major structural changes.
-
----
-
-# Conclusion
-
-This project focuses on building a complete and maintainable segmentation system rather than pursuing benchmark performance alone.
-
-The architecture emphasizes:
-
-* Reproducibility
-* Modularity
-* Ease of experimentation
-* Practical deployment
-
-SegFormer-B0 provides a strong balance between segmentation quality, computational efficiency, and deployment feasibility. The modular design also leaves room for future improvements as dataset size, deployment requirements, and business needs evolve.
-
-
-
-
-
-
-# Training Configuration
-
-| Parameter          | Value                                     |
-| ------------------ | ----------------------------------------- |
-| Backbone           | SegFormer-B0                              |
-| Pretrained Weights | nvidia/segformer-b0-finetuned-ade-512-512 |
-| Epochs             | 30                                        |
-| Batch Size         | 32                                        |
-| Learning Rate      | 0.001                                     |
-| Input Resolution   | 512 × 512                                 |
-| Optimizer          | AdamW                                     |
-| Scheduler          | Cosine Annealing                          |
-| Loss Function      | Weighted Cross Entropy + Dice Loss        |
-
-Best experiment:
-
-```text
-exp005_e30_b32_lr001_d5_c5
-```
-
-Best validation epoch:
-
-```text
-27
-```
-
-Best validation mIoU:
-
-```text
-0.5611
-```
-
----
-
-# Deployment Architecture
-
-```text
-User
- │
- ▼
-React Frontend
- │
- ▼
-Python Backend API
- │
- ▼
-Inference Service
- │
- ▼
-SegFormer-B0 Model
- │
- ▼
-Segmentation Prediction
- │
- ▼
-Overlay Visualization
- │
- ▼
-Response
-```
-
-Responsibilities:
-
-Frontend:
-
-* Image upload
-* Visualization
-* User interaction
-
-Backend:
-
-* Input validation
-* Image preprocessing
-* Model inference
-* Result generation
-
-Model Layer:
-
-* SegFormer-B0 execution
-* Mask generation
-* Class prediction
